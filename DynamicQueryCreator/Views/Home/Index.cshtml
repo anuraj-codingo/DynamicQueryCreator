@@ -1,0 +1,576 @@
+﻿@model List<DynamicQueryCreator.Models.TableDetailsModel>
+@{ ViewData["Title"] = "Advanced Search demo";
+    ViewData["MenuTitle"] = "Advanced Search demo"; }
+
+@section Styles {
+    <link href="~/Content/css/eq.core.min.css" rel="stylesheet" />
+    <link href="~/Content/css/eq.view.min.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/css/custom.css" rel="stylesheet" />
+}
+
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+
+        .dropdown-submenu:hover .dropdown-menu {
+            display: block;
+        }
+
+    .dropbtn {
+        color: black;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        min-width: 160px;
+        box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        background: #ffffff;
+        border-radius: 3px;
+        left: 18px;
+        top: 30px;
+    }
+
+    .dropdown-content a {
+        padding: 10px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 12px;
+    }
+
+
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /*   CheckBox -----*/
+    ul, #myUL {
+        list-style-type: none;
+    }
+
+    #myUL {
+        margin: 0;
+        padding: 0;
+    }
+
+    .box {
+        cursor: pointer;
+        -webkit-user-select: none; /* Safari 3.1+ */
+        -moz-user-select: none; /* Firefox 2+ */
+        -ms-user-select: none; /* IE 10+ */
+        user-select: none;
+    }
+
+        .box::before {
+            content: "\2610";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+    .check-box::before {
+        content: "\2611";
+        color: dodgerblue;
+    }
+
+    .nested {
+        display: none; 
+        padding-left: 20px !important;
+    }
+
+    .active {
+        display: block;
+    }
+    /* CheckBox   ------*/
+</style>
+
+
+
+<div class="container">
+    <div id="eqv-content">
+        <div class="eqv-header-panel">
+            <div class="eqv-entities-block">
+                <hr class="eqv-entities-hr eqv-hr" />
+                <div class="eqv-entities-title">Entities</div>
+                <div class="eqv-entities-panel-container">
+                    <div class="eqv-entities-panel-block">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+            <ul>
+                <li>
+
+                    <input type="checkbox" class="checkall" />
+                    <span class="myUL" style="cursor:pointer">@Model[i].TableDisplayName</span>
+                    <ul class="nested">
+                        @for (int j = 0; j < Model[i].Columndetail.Count; j++)
+                        {
+        <li>
+            <div class="checkbox AddallColumn">
+                <label>
+                    <input type="hidden" class="AddallColumn_TableDisplayName" value="@Model[i].TableDisplayName" />
+                    <input type="hidden" class="AddallColumn_Displaycolumnname" value="@Model[i].Columndetail[j].Displaycolumnname" />
+                    <input type="hidden" class="AddallColumn_TableName" value="@Model[i].TableName" />
+                    <input type="hidden" class="AddallColumn_ColumName" value="@Model[i].Columndetail[j].column_name" />
+                    <input type="hidden" class="AddallColumn_TableKeyColumnName" value="@Model[i].TableKeyColumnName" />
+                    <input type="hidden" class="AddallColumn_DataTypeName" value="@Model[i].Columndetail[j].DataTypeName" />
+                    <input type="checkbox" class="checkone" value="">@Model[i].Columndetail[j].Displaycolumnname
+                </label>
+            </div>
+
+        </li>
+}
+
+                    </ul>
+                </li>
+            </ul>}
+                    </div>
+                    <div class="eqjs-ep-tool-panel eqjs-mobile">
+                        <div class="eqjs-ep-tool-panel-left-side">
+                            <div class="eqjs-ep-tool-panel-deselect-all" title="Clear selection" onclick="ClearColumnSection()">
+                            </div>
+                        </div>
+                        <div class="eqjs-ep-tool-panel-right-side">
+                            <div class="eqjs-ep-tool-panel-add-columns" title="Add column(s)" onclick="AddallColumn()">
+                            </div>
+                            <div class="eqjs-ep-tool-panel-add-cond" title="Add condition(s)" onclick="AddallCondition()">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="eqv-central-block">
+                <div class="eqv-columns-block">
+                    <hr class="eqv-columns-hr eqv-hr" />
+                    <div class="eqv-columns-title">Columns</div>
+                    <div class="eqv-columns-panel-container">
+                        <!-- ColumnsPanel widget placeholder -->
+                        <div id="ColumnsPanel" class="eqjs-qc-panel eqjs-mobile">
+                            <div class="eqjs-qc-columns" style="max-height: 94px;">
+                                <div id="columnadd"></div>
+
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-default" type="button" data-toggle="dropdown">
+                                    Tables
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    @for (int i = 0; i < Model.Count; i++)
+                                    {
+                        <li class="dropdown-submenu">
+                            <a class="test" tabindex="-1" href="#">@Model[i].TableDisplayName <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                @for (int j = 0; j < Model[i].Columndetail.Count; j++)
+                                {
+                <li><a tabindex="-1" onclick="Addcolumn('@Model[i].TableName.Replace("dbo.","")','@Model[i].Columndetail[j].column_name','@Model[i].TableDisplayName','@Model[i].Columndetail[j].Displaycolumnname','@Model[i].TableKeyColumnName')">@Model[i].Columndetail[j].Displaycolumnname</a></li>}
+                            </ul>
+                        </li>}
+
+
+
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="eqv-conditions-block">
+                    <hr class="eqv-conditions-hr eqv-hr" />
+                    <div class="eqv-conditions-title">Conditions</div>
+                    <div class="eqv-query-panel-container">
+                        <!-- QueryPanel widget placeholder -->
+                        <div id="QueryPanel">
+                            <div class="eqjs-qp-conditions null eqjs-qp-conditions-root" data-conditions="">
+                                <div id="wherepanel">
+
+                                </div>
+                            </div>
+
+
+
+                            <div class="dropdown">
+                                <a class="dropbtn">[Add new condition]</a>
+                                <div class="dropdown-content">
+                                    <ul>
+                                        @for (int i = 0; i < Model.Count; i++)
+                                        {
+                            <li class="dropdown-submenu" style="list-style:none">
+                                <a class="test">@Model[i].TableDisplayName <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    @for (int j = 0; j < Model[i].Columndetail.Count; j++)
+                                    {
+                    <li style="list-style:none"><a tabindex="-1" onclick="AddWhere('@Model[i].TableName.Replace("dbo.","")','@Model[i].Columndetail[j].column_name','@Model[i].TableDisplayName','@Model[i].Columndetail[j].Displaycolumnname','@Model[i].Columndetail[j].DataTypeName')">@Model[i].Columndetail[j].Displaycolumnname</a></li>}
+                                </ul>
+                            </li>
+}
+
+
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eqv-menu-block">
+                <hr class="eqv-menu-hr eqv-hr" />
+                <div class="eqv-menu-title">Query Menu</div>
+                <div class="eqv-menu-content">
+                    <div id="QueryNameLabel"></div>
+
+                    <a id="ClearQueryButton" class="eqv-button" onclick="Clearcolumns()">Clear</a>
+
+                    <div class="eqv-dropdown-container">
+                        <a id="LoadQueryButton" class="eqv-button eqv-drop-button">Load <span style="float: right">&#x25BC;</span></a>
+                        <div class="eqv-dropdown-content">
+                        </div>
+                    </div>
+
+
+                    <div class="eqv-dropdown-container">
+                        <a id="StorageDropButton" class="eqv-button eqv-drop-button">Storage <span style="float: right">&#x25BC;</span></a>
+                        <div class="eqv-dropdown-content">
+                            <a id="NewQueryButton" href="#">New query</a>
+                            <a id="SaveQueryButton" href="#">Save query</a>
+                            <a id="CopyQueryButton" href="#">Save query as...</a>
+                            <a id="RemoveQueryButton" href="#">Remove query</a>
+                        </div>
+                    </div>
+
+                    <a id="ExecuteQueryButton" class="eqv-button eqv-button-execute" onclick="ExecuteQuery()">Execute</a>
+
+                    <div id="ChangeLocale" class="eqv-select"></div>
+
+                    <div><p></p></div>
+
+                </div>
+            </div>
+        </div>
+        <div class="eqv-bottom-panel">
+            <div class="eqv-sql-panel">
+                <hr class="eqv-sql-panel-hr eqv-hr" />
+                <div class="eqv-sql-panel-title">SQL</div>
+                <div id="StatementPanel" class="eqv-sql-block">
+                    <div class="sql-panel-result sqlquery">
+
+                    </div>
+                </div>
+            </div>
+            <div class="eqv-result-panel">
+                <hr class="eqv-result-panel-hr eqv-hr" />
+
+                <div class="eqv-result-panel-title">
+                    Result
+                    <span id="ResultCount" style="display:none; margin-left:20px; font-size:small"></span>
+
+                    <span class="eqv-export-buttons">
+                        <a class="eqjs-export" href="#" onclick="ExportTable('Excel')" data-format="excel-html">Export to Excel</a>
+                        <a class="eqjs-export" href="#" onclick="ExportTable('Csv')" data-format="csv">Export to CSV</a>
+                    </span>
+
+                </div>
+
+                <input type="hidden" value="" />
+                <div id="ResultPanel" class="eqv-result-panel-content">
+                    <div class="eqv-result-grid">
+                        <div class="eqv-grid-panel null">
+                            <div id="tablebind"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+
+            $(".checkone").on('click', function (event) {
+
+                if (!this.checked) {
+                    $(this).parent().parent().parent().parent().parent().find('input[type=checkbox].checkall').prop('checked', false)              }
+              });
+            $(".checkall").on('click', function (event) {
+
+                if (this.checked) {
+                    $(this).parent().children().children().find('input.checkone').prop("checked", true);;
+                }
+                else {
+                    $(this).parent().children().children().find('input.checkone').prop("checked", false);;
+                }
+
+            });
+            $(".myUL").on('click', function (event) {
+                this.parentElement.querySelector(".nested").classList.toggle("active");
+            });
+
+
+        });
+        function ClearColumnSection() {
+
+            jQuery('.checkall').each(function () {
+                debugger
+                if ($(this).prop("checked")) {
+                    $(this).prop("checked",false);
+                }
+
+            });
+            jQuery('.AddallColumn').each(function () {
+                if ($(this).find('input.checkone').prop("checked")) {
+                    $(this).find('input.checkone').prop("checked", false);
+                  }
+
+            });
+        }
+        function AddallCondition() {
+            jQuery('.AddallColumn').each(function () {
+                if ($(this).find('input.checkone').prop("checked")) {
+
+                    var tablename = $(this).find('input.AddallColumn_TableName').val();
+                    var columnname = $(this).find('input.AddallColumn_ColumName').val();;
+                    var TableDisplayName = $(this).find('input.AddallColumn_TableDisplayName').val();
+                    var ColumnDisplayName = $(this).find('input.AddallColumn_Displaycolumnname').val();
+                    var DataTypeName = $(this).find('input.AddallColumn_DataTypeName').val();
+                    
+                    //var TableKeyColumnName = $(this).find('input.AddallColumn_TableKeyColumnName').val();;
+                    AddWhere(tablename, columnname, TableDisplayName, ColumnDisplayName, DataTypeName);
+                    //Addcolumn(tablename, columnname, TableDisplayName, ColumnDisplayName)
+                }
+
+            });
+        }
+        function AddallColumn() {
+            Clearcolumns();
+
+            jQuery('.AddallColumn').each(function () {
+                if ($(this).find('input.checkone').prop("checked")) {
+
+                         var tablename=$(this).find('input.AddallColumn_TableName').val();
+                         var columnname=$(this).find('input.AddallColumn_ColumName').val();;
+                         var TableDisplayName=$(this).find('input.AddallColumn_TableDisplayName').val();;
+                         var ColumnDisplayName=$(this).find('input.AddallColumn_Displaycolumnname').val();;
+                         var TableKeyColumnName=$(this).find('input.AddallColumn_TableKeyColumnName').val();;
+
+                    Addcolumn(tablename, columnname, TableDisplayName, ColumnDisplayName, TableKeyColumnName)
+                         }
+
+                         });
+                         }
+        function AddWhere(tablename, columnname, TableDisplayName, ColumnDisplayName, DataTypeName) {
+
+            var htmtstring = '<div class="eqjs-qp-row eqjs-qp-row-condition eqjs-qp-level-1 Conditionforselect">' +
+                '<div class="eqjs-qp-condelement eqjs-qp-attrelement"><a href="javascript:void(0)">' + TableDisplayName + '.' + ColumnDisplayName + '</a>' +
+                ' <input type = "hidden" class="tablename" value = "' + tablename + '" /> <input type="hidden" class="Columnname" value="' + columnname + '" /><input type="hidden" class="DataTypeName" value="' + DataTypeName + '" /></div> <div><div class="dropdown">' +
+                ' <a class="dropbtn Wherecon">Starts With</a >' +
+                '<div class="dropdown-content ">' +
+                ' <a onclick="ConditionFunction(this)" href="#">Starts With</a>' +
+                '<a  onclick="ConditionFunction(this)" href="#">contains</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is equal to</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is in list</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">does not start with</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">does not contain</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is not equal to</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is not in list</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is null</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">is not null</a>' +
+                ' <a onclick="ConditionFunction(this)" href="#">Between</a>' +
+                '</div></div ></div>' +
+                '<div> <a href="javascript:void(0)" class="ConditionValue" onclick="ShowTextbox(this)" title="[enter value]">[enter value]</a>' +
+
+                '<div class="input-group" style="width:60%"><input type = "text" class="form-control inputvalue1 datepicker"  onblur="Hidetextbox(this)"  style = "display: none;" ><input class="form-control inputvalue2 datepicker"   onblur="Hidetextbox(this)" type = "text" style = "display: none;" ></div></div > <div class="eqjs-qp-condition-buttonsBlock">' +
+
+            '<div class="glyphicon glyphicon-trash" onclick="DeleteColumn(this)" title="Show menu"></div></div></div>';
+
+            $('#wherepanel').html($('#wherepanel').html() + htmtstring);
+            getsqlquery();
+        }
+
+        function ConditionFunction(con) {
+            $(con).parent("div").parent("div").find(".Wherecon")[0].text = con.text;
+            getsqlquery();
+        }
+
+        function ShowTextbox(obj) {
+            debugger;
+            obj.style.display = 'none';
+            $(obj).parent().find('input.inputvalue1').css('display', 'block');
+            //$(obj).parent().find('input.inputvalue2').css('display', 'block');
+            //$('.datepicker').datepicker();
+        }
+        function Hidetextbox(obj) {
+            debugger;
+            obj.style.display = 'none';
+            obj.parentElement.parentElement.children[0].style.display = 'Block';
+            if (obj.value != "") {
+                obj.parentElement.parentElement.children[0].text = obj.value
+
+            }
+            else {
+                obj.parentElement.parentElement.children[0].text = "[enter value]";
+            }
+            getsqlquery();
+        }
+        function Addcolumn(tablename, columnname, TableDisplayName, ColumnDisplayName, TableKeyColumnName) {
+            var htmlstring = '<div class="eqjs-qc-row eqjs-qc-row-column-entattr active columndelete" data-show-buttons="">' +
+                '<div class="eqjs-button-placeholder eqjs-qc-button-placeholder eqjs-qc-colelement eqjs-qc-sortbutton-placeholder">' +
+                '</div><div class="eqjs-qc-expr-block">' +
+                '<div class="eqjs-qc-colelement eqjs-qc-attrelement getcolumnclass">' +
+                '<a href="javascript:void(0)" title="Client City">' + TableDisplayName + '.' + ColumnDisplayName + '</a>' +
+                ' <input type="hidden" class="tablename" value="' + tablename + '"/><input type="hidden" class="Columnname" value="' + columnname + '"/><input type="hidden" class="TableKeyColumnName" value="' + TableKeyColumnName + '"/> </div >' +
+                ' </div><div class="eqjs-qc-colelement eqjs-qc-captionelement getcolumnvalue">' +
+                '<a href="javascript:void(0)" title="City">' + ColumnDisplayName + '</a>' +
+                '<input style="display: none;"></div>' +
+                '<div class="eqjs-column-buttonsBlock eqjs-qc-buttonsBlock">' +
+                '<div class="eqjs-button-placeholder eqjs-qc-button-placeholder eqjs-qc-menubutton-placeholder" data-btnplaceholder="">' +
+                '<div class="glyphicon glyphicon-trash" onclick="DeleteColumn(this)" title="Show menu"></div>' +
+                '</div>' +
+                ' </div>' +
+                '</div>';
+
+            $('#columnadd').html($('#columnadd').html() + htmlstring);
+            getsqlquery()
+        }
+
+        function DeleteColumn(obj) {
+
+            $(obj).parent().parent().parent().remove();
+            getsqlquery();
+        }
+
+        function getsqlquery() {
+            var Tabledetail = GetTableList();
+            var ConditionDetails = GetTableCoditionList();
+            $.ajax({
+                dataType: 'json',
+                type: 'POST',
+                  url: '@Url.Action("GetQuery", "Home")',
+                data: { Tabledetails: Tabledetail, ConditionDetails: ConditionDetails },
+                success: function (response) {
+                    $('.sqlquery').empty();
+                    $('.sqlquery').append(response);
+                },
+                failure: function (response) {
+
+                }
+
+            });
+        }
+        function GetTableCoditionList(){
+            var CoditionList = [];
+            $(".Conditionforselect").each(function () {
+
+                var CoditionDetails = {};
+                CoditionDetails["Condition"] = $(this).find('a.Wherecon')[0].text;
+                CoditionDetails["Value"] = $(this).find('a.ConditionValue')[0].text == "[enter value]" ? "" : $(this).find('a.ConditionValue')[0].text;
+                CoditionDetails["Tablename"] = $(this).find('input.tablename')[0].value;
+                CoditionDetails["Columnname"] = $(this).find('input.Columnname')[0].value;
+                CoditionList.push(CoditionDetails);
+            });
+
+
+            return CoditionList;
+        }
+
+        function GetTableList() {
+
+
+            var TableList = [];
+            $(".getcolumnclass").each(function () {
+
+                var TableDetails = {};
+                TableDetails["Tablename"] = this.children[1].value;
+                TableDetails["Columnname"] = this.children[2].value;
+                TableDetails["TableKeyColumnName"] = this.children[3].value;
+                TableList.push(TableDetails);
+            });
+
+
+            return TableList;
+
+        }
+
+
+        function ExecuteQuery() {
+            var sqlquery = $('.sqlquery').text();
+            $.ajax(
+                {
+                    type: 'POST',
+                    dataType: 'html',
+                    url: '@Url.Action("GetData", "Home")',
+                    data: { query: sqlquery },
+                    success:
+                        function (response) {
+                            debugger;
+                            $('#tablebind').html(response);
+                        },
+                    error:
+                        function (response) {
+                            debugger;
+                            alert("Error: " + response);
+                        }
+                });
+        }
+        function Clearcolumns() {
+
+            $('#columnadd').empty();
+            $('.sqlquery').empty();
+            $('#tablebind').empty();
+            $('#wherepanel').empty();
+        }
+        function ExportTable(type) {
+            var sqlquery = $('.sqlquery').text();
+         $.ajax({
+             type: "POST",
+
+            url: '@Url.Action("ExportExcel", "Home")',
+            //contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             data: { query: sqlquery },
+        }).done(function (data) {
+
+            //get the file name for download
+            if (data.fileName != "") {
+
+                //use window.location.href for redirect to download action for download the file
+                window.location.href = "@Url.RouteUrl(new { Controller = "Home", Action = "Download" })/?fileName=" + data.fileName;
+                //window.location.href = "ABC_DynamicQuery/Home/Download?fileName="+data.fileName;
+            }
+        });
+
+
+        }
+    </script>
+}

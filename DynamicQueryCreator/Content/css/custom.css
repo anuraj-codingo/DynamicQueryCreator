@@ -1,0 +1,27 @@
+﻿.eqv-entities-panel-block {
+    padding: 15px 0px 0px 20px;
+    max-height: 410px;
+    overflow: auto;
+}
+
+    .eqv-entities-panel-block ul {
+        padding: 0px;
+    }
+
+.glyphicon-trash {
+    background: #EF5350;
+    width: 25px;
+    text-align: center;
+    height: 25px;
+    line-height: 25px;
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+​
+.open > .dropdown-menu {
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2);
+    border: none;
+}
